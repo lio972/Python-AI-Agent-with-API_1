@@ -39,20 +39,21 @@ The AI Agent is a Python-based calculator with both a **command-line interface (
 
 #### Prerequisites
 - Python 3.9 or higher
-- pip (Python package manager)
+- Node.js (for server.js)
+- npm (for Node.js dependencies)
 
 #### Installation
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/python_ai_agent_with_api_hkhu3t.git
-cd python_ai_agent_with_api_hkhu3t
-
-# Install dependencies
-pip install -r requirements.txt
+# Install Node.js dependencies
+npm install
 ```
 
 #### Running the Server
 ```bash
+# Node.js server
+npm run start
+
+# Python server
 python3 server.py
 ```
 
@@ -70,7 +71,26 @@ docker build -t ai-agent-calculator .
 
 #### Run the Container
 ```bash
-docker run -p 5000:5000 ai-agent-calculator
+# Run in detached mode
+docker run -d -p 5000:5000 --name ai-agent ai-agent-calculator
+
+# Run in interactive mode
+docker run -it -p 5000:5000 --name ai-agent ai-agent-calculator
+```
+
+#### Debugging and Container Access
+```bash
+# Get container logs
+docker logs ai-agent
+
+# Access running container shell
+docker exec -it ai-agent /bin/bash
+
+# Stop container
+docker stop ai-agent
+
+# Remove container
+docker rm ai-agent
 ```
 
 ### 3. Accessing the Web UI
