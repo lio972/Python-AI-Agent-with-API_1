@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Calculator</title>
+  <style>
+    /* ... (keep existing styles) ... */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Agent Calculator</h1>
+    <select id="operation">
+      <option value="add">Add</option>
+      <option value="subtract">Subtract</option>
+      <option value="multiply">Multiply</option>
+      <option value="divide">Divide</option>
+      <option value="sqrt">Square Root</option>
+      <option value="power">Power</option>
+    </select>
+    <input type="number" id="num1" placeholder="Enter first number" required>
+    <input type="number" id="num2" placeholder="Enter second number (if needed)">
+    <button onclick="calculate()">Calculate</button>
+    <button onclick="cancel()">Cancel</button>
+    <button onclick="healthCheck()">Health Check</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+
+    async function calculate() {
+      const operation = document.getElementById('operation').value;
+      const num1 = parseFloat(document.getElementById('num1').value);
+      const num2 = parseFloat(document.getElementById('num2').value) || 0;
+      
+      const numbers = [num1];
+      if (operation !== 'sqrt') {
+        numbers.push(num2);
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/calculate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ operation, numbers })
+        });
+        
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        document.getElementById('result').innerText = `Result: ${data.result}`;
+        document.getElementById('result').className = 'result';
+      } catch (error) {
+        document.getElementById('result').innerText = `Error: ${error.message}`;
+        document.getElementById('result').className = 'result error';
+      }
+    }
+
+    async function cancel() {
+      try {
+        const response = await fetch(`${API_BASE}/cancel`, { method: 'POST' });
+        const data = await response.json();
+        document.getElementById('result').innerText = `Status: ${data.message}`;
+        document.getElementById('result').className = 'result';
+      } catch (error) {
+        document.getElementById('result').innerText = `Error: ${error.message}`;
+        document.getElementById('result').className = 'result error';
+      }
+    }
+
+    async function healthCheck() {
+      try {
+        const response = await fetch(`${API_BASE}/health`);
+        const data = await response.json();
+        document.getElementById('result').innerText = `Health: ${JSON.stringify(data, null, 2)}`;
+        document.getElementById('result').className = 'result';
+      } catch (error) {
+        document.getElementById('result').innerText = `Error: ${error.message}`;
+        document.getElementById('result').className = 'result error';
+      }
+    }
+  </script>
+</body>
+</html>
