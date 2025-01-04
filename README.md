@@ -6,18 +6,90 @@ The AI Agent is a Python-based calculator with both a **command-line interface (
 
 ---
 
-## Features
+## System Components and Their Roles
 
-- **Basic Operations**: Addition, subtraction, multiplication, and division
-- **Advanced Operations**: Square root and power calculations
-- **Cancel Operation**: Stop the current operation
-- **Health Check**: Check the system status and supported operations
-- **Interactive CLI**: Simple command-line prompts for easy use
-- **Web UI**: User-friendly interface for calculations
-- **Error Handling**: Graceful handling of invalid inputs and operations
-- **API Endpoints**: RESTful API for programmatic access
-- **Docker Support**: Containerized deployment
-- **Application Control Scripts**: Easy start/stop/restart management (Linux & Windows)
+### 1. CLI (Command Line Interface)
+- **Purpose**: Provides direct command-line access to the calculator functionality
+- **Usage**: Ideal for quick calculations and scripting
+- **Features**:
+  - Interactive prompt for operations
+  - Supports all mathematical operations
+  - Health check and cancel operation commands
+- **File**: `agent.py`
+
+### 2. Server
+- **Purpose**: Hosts the web interface and API endpoints
+- **Usage**: Serves as the backend for web UI and API access
+- **Features**:
+  - RESTful API endpoints
+  - Web server for UI
+  - Handles all calculation requests
+- **Files**: `server.py` (Python) and `server.js` (Node.js)
+
+### 3. Agent
+- **Purpose**: Core calculation engine
+- **Usage**: Performs all mathematical operations
+- **Features**:
+  - Implements all supported operations
+  - Error handling for invalid inputs
+  - Pure business logic implementation
+- **Files**: `agent.py` and `agent.js`
+
+### 4. API
+- **Purpose**: Provides programmatic access to calculator functionality
+- **Usage**: Integration with other applications
+- **Features**:
+  - RESTful endpoints for calculations
+  - Health check endpoint
+  - Cancel operation endpoint
+- **Access**: Available through both server implementations
+
+---
+
+## Making API Calls
+
+### Windows (Command Prompt)
+```cmd
+:: Calculate addition
+curl -X POST http://localhost:5000/calculate ^
+  -H "Content-Type: application/json" ^
+  -d "{\"operation\": \"add\", \"numbers\": [5, 3]}"
+
+:: Health check
+curl -X GET http://localhost:5000/health
+
+:: Cancel operation
+curl -X POST http://localhost:5000/cancel
+```
+
+### Windows (PowerShell)
+```powershell
+# Calculate addition
+Invoke-WebRequest -Uri http://localhost:5000/calculate `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"operation": "add", "numbers": [5, 3]}'
+
+# Health check
+Invoke-WebRequest -Uri http://localhost:5000/health -Method GET
+
+# Cancel operation
+Invoke-WebRequest -Uri http://localhost:5000/cancel -Method POST
+```
+
+### Linux (Bash)
+```bash
+# Calculate addition
+curl -X POST http://localhost:5000/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"operation": "add", "numbers": [5, 3]}'
+
+# Health check
+curl -X GET http://localhost:5000/health
+
+# Cancel operation
+curl -X POST http://localhost:5000/cancel
+```
 
 ---
 
