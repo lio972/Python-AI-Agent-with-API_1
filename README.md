@@ -6,90 +6,184 @@ The AI Agent is a Python-based calculator with both a **command-line interface (
 
 ---
 
-## System Components and Their Roles
+## System Architecture
 
-### 1. CLI (Command Line Interface)
-- **Purpose**: Provides direct command-line access to the calculator functionality
-- **Usage**: Ideal for quick calculations and scripting
-- **Features**:
-  - Interactive prompt for operations
-  - Supports all mathematical operations
-  - Health check and cancel operation commands
-- **File**: `agent.py`
+### Architecture Overview
+```
++-------------------+       +-------------------+       +-------------------+
+|    Web Browser    |       |   Command Line    |       | External Systems  |
+|   (User Interface)|       |  Interface (CLI)  |       |   (API Clients)   |
++--------+----------+       +---------+---------+       +---------+---------+
+         |                            |                           |
+         |                            |                           |
+         v                            v                           v
++--------+----------+       +---------+---------+       +---------+---------+
+|   Web Server      |<----->|   Agent Core      |<----->|   REST API        |
+| (server.py/js)    |       | (agent.py/js)     |       | Endpoints         |
++--------+----------+       +---------+---------+       +---------+---------+
+         |                            |                           |
+         |                            |                           |
+         v                            v                           v
++--------+----------+       +---------+---------+       +---------+---------+
+|  HTTP Requests    |       |  Direct Calls     |       |  HTTP Requests    |
+|  (HTML/JSON)      |       |  (Python/JS)      |       |  (JSON)           |
++-------------------+       +-------------------+       +-------------------+
+```
 
-### 2. Server
-- **Purpose**: Hosts the web interface and API endpoints
-- **Usage**: Serves as the backend for web UI and API access
-- **Features**:
-  - RESTful API endpoints
-  - Web server for UI
-  - Handles all calculation requests
-- **Files**: `server.py` (Python) and `server.js` (Node.js)
+### Component Roles and Interactions
 
-### 3. Agent
-- **Purpose**: Core calculation engine
-- **Usage**: Performs all mathematical operations
-- **Features**:
-  - Implements all supported operations
-  - Error handling for invalid inputs
-  - Pure business logic implementation
-- **Files**: `agent.py` and `agent.js`
+1. **Web Browser (UI)**
+   - **Role**: Provides user-friendly interface for calculations
+   - **Interactions**:
+     - Sends HTTP requests to Web Server
+     - Receives HTML/JSON responses
+     - Handles user input/output
 
-### 4. API
-- **Purpose**: Provides programmatic access to calculator functionality
-- **Usage**: Integration with other applications
-- **Features**:
-  - RESTful endpoints for calculations
-  - Health check endpoint
-  - Cancel operation endpoint
-- **Access**: Available through both server implementations
+2. **Command Line Interface (CLI)**
+   - **Role**: Direct access to calculator functionality
+   - **Interactions**:
+     - Directly calls Agent Core methods
+     - Handles text-based input/output
+     - Provides immediate feedback
+
+3. **Web Server**
+   - **Role**: Handles HTTP requests and serves UI/API
+   - **Interactions**:
+     - Receives requests from Web Browser and API clients
+     - Calls Agent Core for calculations
+     - Returns HTML/JSON responses
+
+4. **Agent Core**
+   - **Role**: Performs all mathematical operations
+   - **Interactions**:
+     - Receives requests from Web Server and CLI
+     - Performs calculations
+     - Returns results to caller
+
+5. **REST API**
+   - **Role**: Provides programmatic access to calculator
+   - **Interactions**:
+     - Receives JSON requests from external systems
+     - Calls Agent Core for calculations
+     - Returns JSON responses
 
 ---
 
-## Making API Calls
+## Security Best Practices
 
-### Windows (Command Prompt)
-```cmd
-:: Calculate addition
-curl -X POST http://localhost:5000/calculate ^
-  -H "Content-Type: application/json" ^
-  -d "{\"operation\": \"add\", \"numbers\": [5, 3]}"
+### 1. Input Validation
+- **Implementation**:
+  ```python
+  def validate_input(numbers, operation):
+      if not isinstance(numbers, list):
+          raise ValueError("Numbers must be a list")
+      if operation not in VALID_OPERATIONS:
+          raise ValueError("Invalid operation")
+      for num in numbers:
+          if not isinstance(num, (int, float)):
+              raise ValueError("Numbers must be numeric")
+  ```
+- **Best Practices**:
+  - Validate all user inputs
+  - Use strict type checking
+  - Implement range checks for numbers
 
-:: Health check
-curl -X GET http://localhost:5000/health
+### 2. Rate Limiting
+- **Implementation** (using Express.js middleware):
+  ```javascript
+  const rateLimit = require('express-rate-limit');
 
-:: Cancel operation
-curl -X POST http://localhost:5000/cancel
-```
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
+  });
 
-### Windows (PowerShell)
-```powershell
-# Calculate addition
-Invoke-WebRequest -Uri http://localhost:5000/calculate `
-  -Method POST `
-  -Headers @{"Content-Type"="application/json"} `
-  -Body '{"operation": "add", "numbers": [5, 3]}'
+  app.use(limiter);
+  ```
+- **Best Practices**:
+  - Implement rate limiting on API endpoints
+  - Use appropriate window sizes
+  - Provide clear rate limit headers
 
-# Health check
-Invoke-WebRequest -Uri http://localhost:5000/health -Method GET
+### 3. HTTPS Enforcement
+- **Implementation** (in production):
+  ```javascript
+  app.use((req, res, next) => {
+    if (!req.secure) {
+      return res.redirect('https://' + req.headers.host + req.url);
+    }
+    next();
+  });
+  ```
+- **Best Practices**:
+  - Always use HTTPS in production
+  - Redirect HTTP to HTTPS
+  - Use HSTS headers
 
-# Cancel operation
-Invoke-WebRequest -Uri http://localhost:5000/cancel -Method POST
-```
+### 4. Security Headers
+- **Implementation**:
+  ```javascript
+  const helmet = require('helmet');
+  app.use(helmet());
+  ```
+- **Best Practices**:
+  - Set Content Security Policy (CSP)
+  - Enable XSS protection
+  - Prevent MIME type sniffing
+  - Set X-Frame-Options
 
-### Linux (Bash)
-```bash
-# Calculate addition
-curl -X POST http://localhost:5000/calculate \
-  -H "Content-Type: application/json" \
-  -d '{"operation": "add", "numbers": [5, 3]}'
+### 5. Error Handling
+- **Implementation**:
+  ```python
+  try:
+      result = agent.calculate(operation, *numbers)
+  except Exception as e:
+      return {
+          'error': str(e),
+          'status': 400
+      }
+  ```
+- **Best Practices**:
+  - Never expose stack traces
+  - Use generic error messages
+  - Log errors securely
 
-# Health check
-curl -X GET http://localhost:5000/health
+### 6. Authentication (for API)
+- **Implementation** (Basic Auth example):
+  ```javascript
+  const basicAuth = require('express-basic-auth');
 
-# Cancel operation
-curl -X POST http://localhost:5000/cancel
-```
+  app.use('/api', basicAuth({
+    users: { 'admin': 'securepassword' },
+    challenge: true
+  }));
+  ```
+- **Best Practices**:
+  - Use token-based authentication (JWT)
+  - Implement proper password hashing
+  - Use secure session management
+
+### 7. Dependency Security
+- **Implementation**:
+  ```bash
+  npm audit
+  pip-audit
+  ```
+- **Best Practices**:
+  - Regularly update dependencies
+  - Use security scanners
+  - Remove unused dependencies
+
+### 8. Logging and Monitoring
+- **Implementation**:
+  ```javascript
+  const morgan = require('morgan');
+  app.use(morgan('combined'));
+  ```
+- **Best Practices**:
+  - Log security-relevant events
+  - Implement log rotation
+  - Monitor for suspicious activity
 
 ---
 
