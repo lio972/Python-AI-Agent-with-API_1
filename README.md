@@ -6,6 +6,145 @@ The AI Agent is a Python-based calculator with both a **command-line interface (
 
 ---
 
+## On-Premise Server Security Best Practices
+
+When deploying the AI Agent on non-cloud infrastructure (NAS, bare metal servers, on-premise servers, Raspberry Pi, etc.), additional security measures must be implemented to protect against common attacks. Below are key security considerations and implementations:
+
+### 1. Physical Security
+- **Implementation**:
+  - Use locked server rooms or cabinets
+  - Implement access control systems
+  - Use surveillance cameras
+- **Best Practices**:
+  - Restrict physical access to authorized personnel
+  - Maintain access logs
+  - Use tamper-evident seals
+
+### 2. Network Security
+- **Implementation**:
+  ```bash
+  # Configure firewall (UFW example)
+  sudo ufw allow 22/tcp
+  sudo ufw allow 80/tcp
+  sudo ufw allow 443/tcp
+  sudo ufw enable
+  ```
+- **Best Practices**:
+  - Use firewalls to restrict access
+  - Implement VLANs for network segmentation
+  - Disable unused ports and services
+  - Use VPN for remote access
+
+### 3. System Hardening
+- **Implementation**:
+  ```bash
+  # Disable root login
+  sudo sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+  sudo systemctl restart sshd
+
+  # Remove unused packages
+  sudo apt-get autoremove --purge
+  ```
+- **Best Practices**:
+  - Disable unnecessary services
+  - Remove unused software
+  - Use SELinux or AppArmor
+  - Implement file integrity monitoring
+
+### 4. User Management
+- **Implementation**:
+  ```bash
+  # Create limited user
+  sudo adduser deployuser
+  sudo usermod -aG sudo deployuser
+
+  # Set password policies
+  sudo apt-get install libpam-pwquality
+  sudo nano /etc/pam.d/common-password
+  ```
+- **Best Practices**:
+  - Use strong password policies
+  - Implement account lockout policies
+  - Use sudo for privilege escalation
+  - Regularly review user accounts
+
+### 5. Patch Management
+- **Implementation**:
+  ```bash
+  # Set up automatic updates
+  sudo apt-get install unattended-upgrades
+  sudo dpkg-reconfigure --priority=low unattended-upgrades
+  ```
+- **Best Practices**:
+  - Implement automated patching
+  - Test patches in staging
+  - Maintain patch schedules
+  - Monitor for security updates
+
+### 6. Backup and Recovery
+- **Implementation**:
+  ```bash
+  # Set up cron job for backups
+  echo "0 2 * * * /usr/local/bin/backup-script.sh" | sudo tee -a /var/spool/cron/crontabs/root
+  ```
+- **Best Practices**:
+  - Implement automated backups
+  - Test recovery procedures
+  - Store backups offsite
+  - Maintain backup retention policies
+
+### 7. Logging and Monitoring
+- **Implementation**:
+  ```bash
+  # Set up centralized logging
+  sudo apt-get install rsyslog
+  sudo nano /etc/rsyslog.conf
+  ```
+- **Best Practices**:
+  - Implement centralized logging
+  - Set up log rotation
+  - Monitor for suspicious activity
+  - Use intrusion detection systems (IDS)
+
+### 8. Application Security
+- **Implementation**:
+  ```bash
+  # Set up AppArmor profile
+  sudo aa-genprof /path/to/application
+  ```
+- **Best Practices**:
+  - Run applications with least privilege
+  - Use application sandboxing
+  - Implement input validation
+  - Use secure coding practices
+
+### 9. SSL/TLS Configuration
+- **Implementation**:
+  ```bash
+  # Generate self-signed certificate
+  sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+  ```
+- **Best Practices**:
+  - Use strong TLS configurations (TLS 1.2+)
+  - Implement certificate pinning
+  - Use HSTS headers
+  - Regularly rotate certificates
+
+### 10. Security Auditing
+- **Implementation**:
+  ```bash
+  # Run security audit
+  sudo apt-get install lynis
+  sudo lynis audit system
+  ```
+- **Best Practices**:
+  - Perform regular security audits
+  - Use vulnerability scanners
+  - Implement penetration testing
+  - Maintain security documentation
+
+---
+
 ## Cloud and Server Deployment Security
 
 When deploying the AI Agent to cloud environments or production servers, additional security measures must be implemented to protect against common attacks. Below are key security considerations and implementations:
