@@ -6,6 +6,150 @@ The AI Agent is a Python-based calculator with both a **command-line interface (
 
 ---
 
+## Cloud and Server Deployment Security
+
+When deploying the AI Agent to cloud environments or production servers, additional security measures must be implemented to protect against common attacks. Below are key security considerations and implementations:
+
+### 1. Network Security
+- **Implementation**:
+  ```bash
+  # Use security groups (AWS) or firewall rules (GCP/Azure)
+  # Allow only necessary ports (e.g., 443 for HTTPS)
+  # Block all other incoming traffic
+  ```
+- **Best Practices**:
+  - Use Virtual Private Cloud (VPC) with private subnets
+  - Implement Network Access Control Lists (NACLs)
+  - Use security groups with least privilege principle
+  - Enable VPC flow logs for monitoring
+
+### 2. Web Application Firewall (WAF)
+- **Implementation**:
+  ```bash
+  # AWS WAF example
+  aws waf create-web-acl --name MyWebACL \
+    --default-action "Block" \
+    --scope REGIONAL \
+    --visibility-config SampledRequestsEnabled=true,CloudWatchMetricsEnabled=true,MetricName=MyWebACLMetric
+  ```
+- **Best Practices**:
+  - Enable WAF with OWASP Top 10 rules
+  - Block common attack patterns (SQLi, XSS, etc.)
+  - Set up rate-based rules
+  - Monitor and analyze blocked requests
+
+### 3. DDoS Protection
+- **Implementation**:
+  ```bash
+  # AWS Shield Advanced example
+  aws shield create-protection --name MyDDoSProtection \
+    --resource-arn arn:aws:elasticloadbalancing:region:account-id:loadbalancer/app/MyLoadBalancer/50dc6c495c0c9188
+  ```
+- **Best Practices**:
+  - Enable DDoS protection services (AWS Shield, Cloudflare, etc.)
+  - Use Content Delivery Network (CDN)
+  - Implement auto-scaling for traffic spikes
+  - Set up health checks and failover
+
+### 4. Data Encryption
+- **Implementation**:
+  ```bash
+  # Enable SSL/TLS
+  openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+  ```
+- **Best Practices**:
+  - Use HTTPS with strong TLS configurations (TLS 1.2+)
+  - Encrypt data at rest (AES-256)
+  - Use KMS for key management
+  - Implement certificate rotation
+
+### 5. Access Control
+- **Implementation**:
+  ```bash
+  # IAM policy example
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject"
+        ],
+        "Resource": "arn:aws:s3:::my-bucket/*"
+      }
+    ]
+  }
+  ```
+- **Best Practices**:
+  - Implement least privilege access
+  - Use IAM roles instead of access keys
+  - Enable multi-factor authentication (MFA)
+  - Regularly review permissions
+
+### 6. Monitoring and Logging
+- **Implementation**:
+  ```bash
+  # CloudWatch Logs example
+  aws logs create-log-group --log-group-name MyAppLogs
+  aws logs create-log-stream --log-group-name MyAppLogs --log-stream-name MyAppStream
+  ```
+- **Best Practices**:
+  - Enable CloudTrail for API logging
+  - Set up CloudWatch alarms
+  - Implement centralized logging
+  - Use SIEM tools for threat detection
+
+### 7. Container Security
+- **Implementation**:
+  ```bash
+  # Docker security scan
+  docker scan my-image
+  ```
+- **Best Practices**:
+  - Use minimal base images
+  - Scan images for vulnerabilities
+  - Implement image signing
+  - Use container runtime security tools
+
+### 8. Secret Management
+- **Implementation**:
+  ```bash
+  # AWS Secrets Manager example
+  aws secretsmanager create-secret --name MySecret --secret-string '{"username":"admin","password":"P@ssw0rd"}'
+  ```
+- **Best Practices**:
+  - Never hardcode secrets
+  - Use secret management services
+  - Rotate secrets regularly
+  - Restrict access to secrets
+
+### 9. Backup and Disaster Recovery
+- **Implementation**:
+  ```bash
+  # AWS Backup example
+  aws backup create-backup-vault --backup-vault-name MyBackupVault
+  aws backup create-backup-plan --backup-plan file://backup-plan.json
+  ```
+- **Best Practices**:
+  - Implement automated backups
+  - Test recovery procedures
+  - Use multi-region replication
+  - Maintain backup retention policies
+
+### 10. Patch Management
+- **Implementation**:
+  ```bash
+  # Automated patching example
+  sudo apt-get update && sudo apt-get upgrade -y
+  ```
+- **Best Practices**:
+  - Implement automated patching
+  - Monitor for security updates
+  - Test patches in staging
+  - Maintain patch schedules
+
+---
+
 ## System Architecture
 
 ### Architecture Overview
