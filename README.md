@@ -17,19 +17,91 @@ The AI Agent is a Python-based calculator with both a **command-line interface (
 - **Error Handling**: Graceful handling of invalid inputs and operations
 - **API Endpoints**: RESTful API for programmatic access
 - **Docker Support**: Containerized deployment
+- **Application Control Scripts**: Easy start/stop/restart management (Linux & Windows)
 
 ---
 
-## Available Operations
+## Docker Prerequisites
 
-| Operation  | Description                     | Example Input       |
-|------------|---------------------------------|---------------------|
-| `add`      | Add two numbers                 | 5 + 3 = 8           |
-| `subtract` | Subtract two numbers            | 5 - 3 = 2           |
-| `multiply` | Multiply two numbers            | 5 * 3 = 15          |
-| `divide`   | Divide two numbers              | 6 / 3 = 2           |
-| `sqrt`     | Square root of a number         | √9 = 3              |
-| `power`    | Raise a number to a power       | 2^3 = 8             |
+### For Windows:
+1. Install Docker Desktop: https://docs.docker.com/desktop/install/windows-install/
+2. Enable WSL 2 backend (recommended)
+3. Allocate at least 4GB RAM in Docker settings
+4. Enable Kubernetes if needed (optional)
+
+### For Linux:
+1. Install Docker Engine: https://docs.docker.com/engine/install/
+2. Add your user to the docker group:
+   ```bash
+   sudo usermod -aG docker $USER
+   newgrp docker
+   ```
+3. Verify installation:
+   ```bash
+   docker --version
+   ```
+
+---
+
+## Essential Docker Commands (20/80 Rule)
+
+### Basic Commands
+```bash
+# Build image
+docker build -t <image-name> .
+
+# Run container
+docker run -d -p <host-port>:<container-port> --name <container-name> <image-name>
+
+# List running containers
+docker ps
+
+# List all containers
+docker ps -a
+
+# Stop container
+docker stop <container-name>
+
+# Remove container
+docker rm <container-name>
+
+# View logs
+docker logs <container-name>
+
+# Execute command in running container
+docker exec -it <container-name> <command>
+```
+
+### Debugging Commands
+```bash
+# Inspect container details
+docker inspect <container-name>
+
+# View resource usage
+docker stats <container-name>
+
+# Copy files to/from container
+docker cp <container-name>:<path> <local-path>
+docker cp <local-path> <container-name>:<path>
+
+# Remove unused images
+docker image prune
+```
+
+### System Management
+```bash
+# List images
+docker images
+
+# Remove image
+docker rmi <image-id>
+
+# Clean up system
+docker system prune
+
+# View disk usage
+docker system df
+```
 
 ---
 
@@ -41,11 +113,30 @@ The AI Agent is a Python-based calculator with both a **command-line interface (
 - Python 3.9 or higher
 - Node.js (for server.js)
 - npm (for Node.js dependencies)
+- Docker (for containerized deployment)
 
 #### Installation
 ```bash
 # Install Node.js dependencies
 npm install
+
+# Make control script executable (Linux/Mac)
+chmod +x app-control.sh
+```
+
+#### Application Control
+```bash
+# Linux/Mac
+./app-control.sh start
+./app-control.sh stop
+./app-control.sh restart
+./app-control.sh status
+
+# Windows
+.\app-control.ps1 start
+.\app-control.ps1 stop
+.\app-control.ps1 restart
+.\app-control.ps1 status
 ```
 
 #### Running the Server
